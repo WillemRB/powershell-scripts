@@ -1,0 +1,30 @@
+{
+	"games": [
+		{
+			"name": "Name of Game",
+			"baseDir": "C:\\Events",
+			"targetDir": "D:\\Test",
+			"files": [
+				"{2D888D5A-63B6-4F8E-800E-8914F4B8412D}.xml",
+				"{3E199C9E-93AA-4BF1-9FE7-023DD53A3336}.xml",
+				"{3F5D0301-5136-4FD1-B58D-A3AB0E7BB867}.xml"
+			],
+			"directories": [
+				"TEST"
+			]
+		},
+		{
+			"name": "Name of Game",
+			"baseDir": "C:\\Events",
+			"targetDir": "D:\\Test",
+			"files": [
+				"{2D888D5A-63B6-4F8E-800E-8914F4B8412D}.xml",
+				"{3E199C9E-93AA-4BF1-9FE7-023DD53A3336}.xml",
+				"{3F5D0301-5136-4FD1-B58D-A3AB0E7BB867}.xml"
+			],
+			"directories": [
+				"TEST"
+			]
+		}
+	]
+}
