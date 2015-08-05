@@ -1,5 +1,6 @@
 <# Scipts that creates backups or restores game files #>
 Param(
+    [Parameter(Mandatory = $True)]$Path,
     [Switch]$Force = $False
 )
 
@@ -67,13 +68,20 @@ function CopyIfNewer([System.String]$fileName, [System.String]$sourceDir, [Syste
     }
 }
 
-$games =  (Get-Content .\data.json | Out-String | ConvertFrom-Json)
-
-foreach ($game in $games.games)
+if (Test-Path $Path)
 {
-    Write-Host $game.name
-    foreach ($file in $game.files)
+    $games =  (Get-Content $Path | Out-String | ConvertFrom-Json)
+
+    foreach ($game in $games.games)
     {
-        CopyIfNewer $file $game.baseDir $game.targetDir
+        Write-Host $game.name
+        foreach ($file in $game.files)
+        {
+            CopyIfNewer $file $game.baseDir $game.targetDir
+        }
     }
+}
+else
+{
+    Write-Host "File $Path does not exist!" -ForegroundColor Red
 }
