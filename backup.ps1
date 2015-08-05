@@ -1,8 +1,18 @@
-<# Scipts that creates backups or restores game files #>
+<# 
+    Scipts that creates backups or restores game files 
+
+    Flags:
+        -Force - Overwrite files that have no changes or would otherwise not be copied.
+        -CleanTarget - Remove the $targetFile if the $sourceFile doesn't exist
+                       Items are moved to the Recycle bin.
+#>
 Param(
     [Parameter(Mandatory = $True)]$Path,
-    [Switch]$Force = $False
+    [Switch]$Force = $False,
+    [Switch]$CleanTarget = $False
 )
+
+Add-Type -AssemblyName Microsoft.VisualBasic
 
 function Log([System.String]$file, [System.String]$status, [System.ConsoleColor]$color) 
 {
@@ -19,6 +29,13 @@ function CopyIfNewer([System.String]$fileName, [System.String]$sourceDir, [Syste
 
     if (-not (Test-Path $sourcePath)) 
     {
+        if ($CleanTarget -and (Test-Path $targetPath))
+        {
+            Log $fileName "REMOVE" Red
+            [Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($targetPath, 'OnlyErrorDialogs', 'SendToRecycleBin')
+            return
+        }
+
         Log $fileName " GONE " Red
         return
     }
@@ -83,5 +100,5 @@ if (Test-Path $Path)
 }
 else
 {
-    Write-Host "File $Path does not exist!" -ForegroundColor Red
+    Write-Host "File '$Path' does not exist!" -ForegroundColor Red
 }
