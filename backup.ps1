@@ -1,5 +1,7 @@
 <# Scipts that creates backups or restores game files #>
-
+Param(
+    [Switch]$Force = $False
+)
 
 function Log([System.String]$file, [System.String]$status, [System.ConsoleColor]$color) 
 {
@@ -16,7 +18,7 @@ function CopyIfNewer([System.String]$fileName, [System.String]$sourceDir, [Syste
 
     if (-not (Test-Path $sourcePath)) 
     {
-        Log $fileName "REMOVE" Red
+        Log $fileName " GONE " Red
         return
     }
 
@@ -38,12 +40,28 @@ function CopyIfNewer([System.String]$fileName, [System.String]$sourceDir, [Syste
     }
     elseif ($sourceFile.LastWriteTime -eq $targetFile.LastWriteTime) 
     {
+        if ($Force)
+        {
+            Log $fileName "FORCED" Magenta
+            Copy-Item $sourcePath $targetPath
+            return
+        }
+
         Log $fileName " SKIP " Gray
         return
     }
     elseif ($sourceFile.LastWriteTime -lt $targetFile.LastWriteTime) 
     {
-        Log $fileName " WARN " Yellow
+        if ($Force)
+        {
+            Log $fileName "FORCED" Magenta
+            Copy-Item $sourcePath $targetPath
+        }
+        else
+        {
+            Log $fileName " WARN " Yellow
+        }
+
         Write-Host "`t`tTarget is newer than Source"
         return
     }
