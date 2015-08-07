@@ -14,6 +14,9 @@ Param(
 
 Add-Type -AssemblyName Microsoft.VisualBasic
 
+$totalFileCount = 0
+$global:filesHandledCount = 0
+
 function Log([System.String]$file, [System.String]$status, [System.ConsoleColor]$color) 
 {
     Write-Host "`t[" -NoNewline
@@ -22,7 +25,7 @@ function Log([System.String]$file, [System.String]$status, [System.ConsoleColor]
     Write-Host $file
 }
 
-function CopyIfNewer([System.String]$fileName, [System.String]$sourceDir, [System.String]$targetDir) 
+function CopyFile([System.String]$fileName, [System.String]$sourceDir, [System.String]$targetDir) 
 {
     $sourcePath = Join-Path $sourceDir $fileName
     $targetPath = Join-Path $targetDir $fileName
@@ -85,16 +88,61 @@ function CopyIfNewer([System.String]$fileName, [System.String]$sourceDir, [Syste
     }
 }
 
+function TotalFileCount($games)
+{
+    $games.games | % { $sum += $_.files.Length }
+
+    $games.games | % `
+    { 
+        foreach ($dir in $_.directories)
+        {
+            $fullPath = Join-Path $_.sourceDir $dir
+
+            if (Test-Path $fullPath)
+            {
+                $sum += (Get-Item $fullPath).GetFiles().Length
+            }
+        }
+    }
+
+    return $sum
+}
+
+function ProgressPercentage
+{
+    $global:filesHandledCount += 1
+
+    Start-Sleep -Seconds 1
+
+    return [int](($filesHandledCount / $totalFileCount) * 100)
+}
+
 if (Test-Path $Path)
 {
     $games =  (Get-Content $Path | Out-String | ConvertFrom-Json)
+
+    $totalFileCount = TotalFileCount $games
 
     foreach ($game in $games.games)
     {
         Write-Host $game.name
         foreach ($file in $game.files)
         {
-            CopyIfNewer $file $game.baseDir $game.targetDir
+            Write-Progress -Activity $game.name -Status $file -PercentComplete $(ProgressPercentage)
+            CopyFile $file $game.sourceDir $game.targetDir
+        }
+        foreach ($dir in $game.directories)
+        {
+            $dirPath = Join-Path $game.sourceDir $dir
+
+            if (Test-Path $dirPath)
+            {
+                (Get-Item $dirPath).GetFiles() | % `
+                { 
+                    Write-Progress -Activity $game.name -Status $dir -PercentComplete $(ProgressPercentage)
+                    CopyFile $_.Name $game.sourceDir $game.targetDir
+                }
+            }
         }
     }
 }
