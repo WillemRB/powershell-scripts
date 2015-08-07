@@ -2,7 +2,7 @@
 	"games": [
 		{
 			"name": "Name of Game",
-			"baseDir": "C:\\Events",
+			"sourceDir": "C:\\Events",
 			"targetDir": "D:\\Test",
 			"files": [
 				"{2D888D5A-63B6-4F8E-800E-8914F4B8412D}.xml",
@@ -15,7 +15,7 @@
 		},
 		{
 			"name": "Name of Game",
-			"baseDir": "C:\\Events",
+			"sourceDir": "C:\\Events",
 			"targetDir": "D:\\Test",
 			"files": [
 				"{2D888D5A-63B6-4F8E-800E-8914F4B8412D}.xml",
