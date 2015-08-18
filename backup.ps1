@@ -90,10 +90,14 @@ function BackupFile([System.String]$fileName, [System.String]$sourceDir, [System
 
 function TotalFileCount($games)
 {
-    $games.games | % { $sum += $_.files.Length }
+    $sum = 0
 
     $games.games | % `
     { 
+        # Add file count
+        $sum += $_.files.Length
+
+        # Add file count of each directory
         foreach ($dir in $_.directories)
         {
             $fullPath = Join-Path $_.sourceDir $dir
@@ -104,6 +108,8 @@ function TotalFileCount($games)
             }
         }
     }
+
+    Write-Host "$sum files in total"
 
     return $sum
 }
@@ -138,7 +144,7 @@ if (Test-Path $Path)
                 (Get-Item $dirPath).GetFiles() | % `
                 { 
                     Write-Progress -Activity $game.name -Status $dir -PercentComplete $(ProgressPercentage)
-                    BackupFile $_.Name $game.sourceDir $game.targetDir
+                    BackupFile $_.Name $dirPath $game.targetDir
                 }
             }
         }
