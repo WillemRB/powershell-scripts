@@ -8,8 +8,8 @@
 #>
 Param(
     [Parameter(Mandatory = $True)]$Path,
-    [Switch]$Force = $False,
-    [Switch]$CleanTarget = $False
+    [Switch]$Force = $false,
+    [Switch]$CleanTarget = $false
 )
 
 Add-Type -AssemblyName Microsoft.VisualBasic
@@ -25,7 +25,7 @@ function Log([System.String]$file, [System.String]$status, [System.ConsoleColor]
     Write-Host $file
 }
 
-function CopyFile([System.String]$fileName, [System.String]$sourceDir, [System.String]$targetDir) 
+function BackupFile([System.String]$fileName, [System.String]$sourceDir, [System.String]$targetDir) 
 {
     $sourcePath = Join-Path $sourceDir $fileName
     $targetPath = Join-Path $targetDir $fileName
@@ -112,8 +112,6 @@ function ProgressPercentage
 {
     $global:filesHandledCount += 1
 
-    Start-Sleep -Seconds 1
-
     return [int](($filesHandledCount / $totalFileCount) * 100)
 }
 
@@ -129,7 +127,7 @@ if (Test-Path $Path)
         foreach ($file in $game.files)
         {
             Write-Progress -Activity $game.name -Status $file -PercentComplete $(ProgressPercentage)
-            CopyFile $file $game.sourceDir $game.targetDir
+            BackupFile $file $game.sourceDir $game.targetDir
         }
         foreach ($dir in $game.directories)
         {
@@ -140,7 +138,7 @@ if (Test-Path $Path)
                 (Get-Item $dirPath).GetFiles() | % `
                 { 
                     Write-Progress -Activity $game.name -Status $dir -PercentComplete $(ProgressPercentage)
-                    CopyFile $_.Name $game.sourceDir $game.targetDir
+                    BackupFile $_.Name $game.sourceDir $game.targetDir
                 }
             }
         }
