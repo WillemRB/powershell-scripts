@@ -2,12 +2,14 @@
     Scipts that creates backups or restores game files 
 
     Flags:
+        -Restore - Restore the backup files to the source location.
         -Force - Overwrite files that have no changes or would otherwise not be copied.
         -CleanTarget - Remove the $targetFile if the $sourceFile doesn't exist
                        Items are moved to the Recycle bin.
 #>
 Param(
     [Parameter(Mandatory = $True)]$Path,
+    [Switch]$Restore = $false,
     [Switch]$Force = $false,
     [Switch]$CleanTarget = $false
 )
@@ -88,6 +90,10 @@ function BackupFile([System.String]$fileName, [System.String]$sourceDir, [System
     }
 }
 
+function RestoreFile([System.String]$fileName, [System.String]$sourceDir, [System.String]$targetDir)
+{
+}
+
 function TotalFileCount($games)
 {
     $sum = 0
@@ -121,36 +127,53 @@ function ProgressPercentage
     return [int](($filesHandledCount / $totalFileCount) * 100)
 }
 
-if (Test-Path $Path)
+function CreateBackup($path)
 {
-    $games =  (Get-Content $Path | Out-String | ConvertFrom-Json)
-
-    $totalFileCount = TotalFileCount $games
-
-    foreach ($game in $games.games)
+    if (Test-Path $path)
     {
-        Write-Host $game.name
-        foreach ($file in $game.files)
-        {
-            Write-Progress -Activity $game.name -Status $file -PercentComplete $(ProgressPercentage)
-            BackupFile $file $game.sourceDir $game.targetDir
-        }
-        foreach ($dir in $game.directories)
-        {
-            $dirPath = Join-Path $game.sourceDir $dir
+        $games =  (Get-Content $path | Out-String | ConvertFrom-Json)
 
-            if (Test-Path $dirPath)
+        $totalFileCount = TotalFileCount $games
+
+        foreach ($game in $games.games)
+        {
+            Write-Host $game.name
+            foreach ($file in $game.files)
             {
-                (Get-Item $dirPath).GetFiles() | % `
-                { 
-                    Write-Progress -Activity $game.name -Status $dir -PercentComplete $(ProgressPercentage)
-                    BackupFile $_.Name $dirPath $game.targetDir
+                Write-Progress -Activity $game.name -Status $file -PercentComplete $(ProgressPercentage)
+                BackupFile $file $game.sourceDir $game.targetDir
+            }
+
+            foreach ($dir in $game.directories)
+            {
+                $dirPath = Join-Path $game.sourceDir $dir
+
+                if (Test-Path $dirPath)
+                {
+                    (Get-Item $dirPath).GetFiles() | % `
+                    { 
+                        Write-Progress -Activity $game.name -Status $dir -PercentComplete $(ProgressPercentage)
+                        BackupFile $_.Name $dirPath $game.targetDir
+                    }
                 }
             }
         }
     }
+    else
+    {
+        Write-Host "File '$Path' does not exist!" -ForegroundColor Red
+    }
+}
+
+function RestoreBackup($path)
+{
+}
+
+if (-not $Restore)
+{
+    CreateBackup $Path
 }
 else
 {
-    Write-Host "File '$Path' does not exist!" -ForegroundColor Red
+    RestoreBackup $Path
 }
