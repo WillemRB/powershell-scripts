@@ -1,4 +1,4 @@
-<# 
+<#
     Script to clean Visual Studio solution folders.
 #>
 Param(
@@ -6,11 +6,13 @@ Param(
     [Parameter()][bool]$ignorePackages = $false
 )
 
-Get-ChildItem $ProjectPath -Recurse `
-| Where { $_.Name.ToLower() -in ("bin", "obj", "testresults", "packages") } `
+$scriptPath = Split-Path $script:MyInvocation.MyCommand.Path
+
+Get-ChildItem $projectPath -Recurse `
+| Where { $_.FullName.ToLower() -match "(\\bin\\|\\obj\\|\\packages\\|\\testresults\\)" } `
 | ForEach `
     {
-        $fullName = $_.FullName
+        $fullName = $_.FullName.Replace($scriptPath, "")
 
         if ($_.FullName.Contains("packages") -and $ignorePackages)
         {
@@ -18,7 +20,7 @@ Get-ChildItem $ProjectPath -Recurse `
         }
         else
         {
-            #Remove-Item $fullName -Recurse -Force
+            Remove-Item $fullName -Recurse -Force
             Write-Host "Removed $fullName" -ForegroundColor Red
         }
     }
