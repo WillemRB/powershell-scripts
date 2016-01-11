@@ -1,4 +1,6 @@
-# Script to clean Visual Studio solution folders.
+<# 
+    Script to clean Visual Studio solution folders.
+#>
 Param(
     [Parameter()][string]$projectPath = ".",
     [Parameter()][bool]$ignorePackages = $false
