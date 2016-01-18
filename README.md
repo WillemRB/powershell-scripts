@@ -1,2 +1,2 @@
-# ps-game-save-backup
-PowerShell script that creates backups of games files and saves.
+# Powershell Scripts
+Bunch of Powershell scripts I made for whatever reason.
