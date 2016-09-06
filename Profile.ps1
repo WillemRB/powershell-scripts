@@ -5,10 +5,11 @@ function VsCmd
     cmd /c "vsvars32.bat&set" |
         ForEach {
             if ($_ -match "=") {
-                $v = $_.split("="); Set-Item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
+                $v = $_.split("="); 
+                Set-Item -Force -Path "ENV:\$($v[0])" -Value "$($v[1])"
             }
         }
     popd
     
-    Write-Host "`nVisual Studio 2015 Command Prompt variables set." -ForegroundColor Green
+    Write-Host "Visual Studio 2015 Command Prompt variables set." -ForegroundColor Green
 }
