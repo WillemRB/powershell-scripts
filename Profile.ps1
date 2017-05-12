@@ -13,3 +13,6 @@ function VsCmd
     
     Write-Host "Visual Studio 2015 Command Prompt variables set." -ForegroundColor Green
 }
+
+# Add additional paths for use in PowerShell
+#$env:Path += ";C:\Tools"
