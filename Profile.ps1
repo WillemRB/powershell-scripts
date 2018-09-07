@@ -16,3 +16,6 @@ function VsCmd
 
 # Add additional paths for use in PowerShell
 #$env:Path += ";C:\Tools"
+
+# Set a default starting location
+Set-Location \
